@@ -1,0 +1,181 @@
+Copyright 2023 <Stamatin Teodor>
+
+# Project 2 -  SVD
+In linear algebra, the singular value decomposition (SVD) is a factorization 
+of a real or complex matrix. It generalizes the eigendecomposition of a
+square normal matrix with an orthonormal eigenbasis to any m X n matrix. It is
+related to the polar decomposition.
+
+## Table of contents
+
+- [Task1](#task1)
+- [Task2](#task2)
+- [Task3](#task3)
+- [Task4](#task4)
+- [Conclusion](#conclusion)
+- [Research](#research)
+
+## Task1
+
+This code performs the singular value decomposition on a matrix and keeps only
+the first k singular values, in order to reduce the dimensionality of the
+matrix. It then calculates an approximate matrix using the reduced matrices,
+and converts the matrix to uint8 type for use as an image.
+
+Steps I followed: 
+> Initializing the final matrix.
+> Converting the matrix to double type.
+> Applying the svd function in Octave and obtaining the matrices U, S, and V.
+> Removing the singular values that are either zero or very small from the matrix S, and keeping only the first k singular values.
+> Calculating the new reduced matrices U, S, and V.
+> Calculating the approximate matrix new_X using the new reduced matrices U, S, and V.
+> Converting the matrix to uint8 type to make it a valid image.
+
+## Task2
+
+This function takes an input image, performs SVD on it, keeps only the first
+pcs principal components, and then reconstructs a compressed version of the
+input image using these principal components.
+
+Steps I followed:
+> Cast photo to double.
+> Calculate the mean of each row of photo and subtract it.
+> Construct the matrix Z.
+> Compute the SVD of Z.
+> Construct the matrix W from the first pcs columns of V.\
+> Project photo_centered onto the space spanned by the columns of W.
+> Approximate photo by multiplying Y by W transpose and adding back the mean.
+> Transform photo_approx to uint8 for display as an image.
+
+## Task3
+
+This takes an input image, performs PCA on it, retains only the top 'pcs'
+principal components, and then reconstructs a compressed version of the input
+image using these principal components.
+
+Steps I followed:
+> Initialize the final matrix
+> Cast photo to double.
+> Calculate the mean of each row of the matrix.
+> Normalize the initial matrix by subtracting the mean of each row.
+> Calculate the covariance matrix.
+> Calculate the eigenvalues and eigenvectors of the covariance matrix.
+> Sort the eigenvalues in descending order and create a matrix V consisting of
+the eigenvectors placed as columns, so that the first column is the eigenvector
+corresponding to the largest eigenvalue and so on.
+> Keep only the first pcs columns
+> Create the Y matrix by changing the basis of the initial matrix.
+> Calculate the new_X matrix, which is an approximation of the initial matrix.
+> Add back the row means subtracted earlier.
+> Convert the matrix to uint8 to be a valid image.
+
+## Task4
+
+### Visualise image
+
+This is a function that visualizes an image from a training matrix. The
+function takes two arguments, train_mat which is a matrix containing multiple
+image samples, and number which is the index of the image that we want to
+visualize.
+
+Steps I followed:
+> Initialize the final matrix.
+> Read the column with number 'number' from the training matrix.
+> Transform the read column into a 28x28 matrix, which must then be transposed.
+> Convert the matrix to uint8 format to be a valid image.
+> Display the image.
+
+### Prepare data
+
+The function initializes two matrices train_mat and train_val to zeros, where
+train_mat is a matrix with dimensions (no_train_images x 784) and train_val
+is a vector with length no_train_images. The function then loads data from the
+specified file using the load() function, which returns a structure containing
+the variables in the file. The training images are stored in the variable X and
+the corresponding labels are stored in Y. The function then saves the first
+no_train_images rows of X and Y to train_mat and train_val, respectively.
+
+Steps I followed:
+> Initialize the size of the training matrix (train_mat) to be no_train_images
+rows and 784 columns.
+> Initialize the size of the training values vector (train_val) to be 1 row and
+no_train_images columns.
+> Load the data from a .mat file specified by name into two variables X and Y.
+> Copy the first no_train_images rows of X into train_mat.
+> Copy the first no_train_images values of Y into train_val.
+> Return train_mat and train_val as output.
+
+### Prepare photo
+
+This function prepares an image by converting it to a row vector of pixel
+values that can be used as input for further processing or analysis.
+
+Steps I followed:
+> Initialize the final row vector sir to a zeros vector with 784 elements
+(corresponding to a 28x28 image).
+> Invert the pixel values of the input image im by subtracting them from 255.
+> Transpose the inverted image im and then reshape it into a row vector using
+the reshape function. This results in a row vector of length 784 (28x28).
+> Copy the values of the resulting row vector into the sir vector, replacing
+the initial zeros. The length function is used to ensure that only the first
+length(im) elements of sir are replaced, in case the input image was smaller
+than 28x28.
+
+### Magic with PCA
+
+his function performs Principal Component Analysis (PCA) on a given training
+matrix train_mat and returns the reconstructed matrix train in the transformed
+space, the mean of each row miu, the transformed data F, and the matrix of
+eigenvectors Vk. The input argument pcs specifies the number of principal
+components to keep.
+
+Steps I followed:
+> Cast train_mat to double
+> Calculate the mean of each row and subtract the mean from each element in
+each column
+> Calculate the covariance matrix of the centered data
+> Compute the eigenvectors and eigenvalues of the covariance matrix
+> Sort the eigenvectors in descending order of eigenvalues
+> Keep only the first pcs eigenvectors
+> Compute the PCA transformed data by multiplying the centered data with the
+matrix of eigenvectors
+> Reconstruct the original data using the PCA transformed data and the matrix
+of eigenvectors
+
+### Classify image
+
+This function takes an image (im), a matrix of training images (train_mat),
+their corresponding labels (train_val), and the number of principal components
+to be used (pcs) as inputs. It returns a prediction label for the input image
+using the K-Nearest Neighbor algorithm.
+
+Steps I followed:
+> Initializes the prediction variable to -1.
+> Casts the input image im to double.
+> Prepares the training data by subtracting from the image the mean of each row
+in the training matrix train_mat using the magic_with_pca function.
+> Changes the basis of the input image by multiplying it with the matrix Vk
+computed from the training matrix using PCA.
+> Calculates the prediction using the k-nearest neighbor method implemented in
+the KNN function, with k set to 5.
+
+### KNN
+
+This function performs k-nearest neighbors classification on a given test.
+
+Steps I followed:
+> Initialize prediction
+> Initialize distances
+> Calculate Euclidean distances between each row of Y and test vector
+> Sort distances in ascending order and keep the first k values
+> Calculate prediction as the median of the k closest labels
+
+## Conclusion
+This project was a good practice and learned a lot of new things. I had a lot
+of fun doing it.
+
+## Research
+https://en.wikipedia.org/wiki/Singular_value_decompositions
+https://builtin.com/data-science/step-step-explanation-principal-component-analysis
+https://www.geeksforgeeks.org/k-nearest-neighbours/
+https://www.analyticsvidhya.com/blog/2018/03/introduction-k-neighbours-algorithm-clustering/
